@@ -10,11 +10,18 @@ namespace ef_core_include_clear
     {
         static void Main()
         {
+            var settings = new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
+
             using (var appDbContext = new AppDbContext())
             {
                 appDbContext.Database.EnsureDeleted();
                 appDbContext.Database.EnsureCreated();
                 Console.WriteLine("The database has been reset.");
+
+                Console.WriteLine("Model: " + appDbContext.Model.GetType().ToString());
+                var model = appDbContext.Model as Microsoft.EntityFrameworkCore.Metadata.Internal.Model;
+                Console.WriteLine(model.DebugView.View);
+
                 appDbContext.Users.Add(new User() {
                     Name = "Tomas Hubelbauer",
                     Car = new Car() {
@@ -42,7 +49,6 @@ namespace ef_core_include_clear
 
             using (var appDbContext = new AppDbContext())
             {
-                var settings = new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
                 // Prime the object first so that lazy loaded properties do not load incrementally as we serialize
                 JsonConvert.SerializeObject(appDbContext, settings);
                 Console.WriteLine("Pre:");
@@ -58,7 +64,6 @@ namespace ef_core_include_clear
 
             using (var appDbContext = new AppDbContext())
             {
-                var settings = new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
                 // Prime the object first so that lazy loaded properties do not load incrementally as we serialize
                 JsonConvert.SerializeObject(appDbContext, settings);
                 Console.WriteLine("Post:");
